@@ -3,7 +3,7 @@
 
 #include "map.h"
 
-int map_init(MAP *map)
+int map_init(MAP* map)
 {
     map->root = NULL;
     map->length = 0;
@@ -11,9 +11,10 @@ int map_init(MAP *map)
     return 0;
 }
 
-int map_clear(MAP *map)
+int map_clear(MAP* map)
 {
-    MNODE *curr, *pred;
+    MNODE* curr;
+    MNODE* pred;
     
     curr = map->root;
     while (curr != NULL) {
@@ -31,9 +32,11 @@ int map_clear(MAP *map)
     return 0;
 }
 
-int map_set(MAP *map, char *key, char *value)
+int map_set(MAP* map, char* key, char* value)
 {
-    MNODE *curr, *pred, *node;
+    MNODE* curr;
+    MNODE* pred;
+    MNODE* node;
     int cmp;
     
     node = malloc(sizeof(MNODE));    
@@ -82,9 +85,9 @@ int map_set(MAP *map, char *key, char *value)
     return 0;
 }
 
-char *map_get(MAP *map, char *key)
+char* map_get(MAP* map, char* key)
 {
-    MNODE *curr;
+    MNODE* curr;
     int cmp;
     
     curr = map->root;
@@ -102,9 +105,9 @@ char *map_get(MAP *map, char *key)
     return NULL;
 }
 
-int map_has(MAP *map, char *key)
+int map_has(MAP* map, char* key)
 {
-    MNODE *curr;
+    MNODE* curr;
     int cmp;
     
     curr = map->root;
@@ -122,9 +125,10 @@ int map_has(MAP *map, char *key)
     return 0;    
 }
 
-int map_remove(MAP *map, char *key)
+int map_remove(MAP* map, char* key)
 {
-    MNODE *curr, *pred;
+    MNODE* curr;
+    MNODE* pred;
     int cmp;
     
     curr = map->root;
@@ -149,14 +153,15 @@ int map_remove(MAP *map, char *key)
     return 0;
 }
 
-int map_length(MAP *map)
+int map_length(MAP* map)
 {
     return map->length;
 }
 
-void map_dispose(MAP *map)
+void map_dispose(MAP* map)
 {
-    MNODE *curr, *pred;
+    MNODE* curr;
+    MNODE* pred;
     
     curr = map->root;
     while (curr != NULL) {

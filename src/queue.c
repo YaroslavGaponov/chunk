@@ -2,7 +2,7 @@
 #include <string.h>
 #include "queue.h"
 
-int queue_init(QUEUE *queue)
+int queue_init(QUEUE* queue)
 {   
     queue->root = NULL;
     queue->length = 0;
@@ -10,9 +10,10 @@ int queue_init(QUEUE *queue)
     return 0;
 }
 
-int queue_clear(QUEUE *queue)
+int queue_clear(QUEUE* queue)
 {
-    QNODE *curr, *pred;
+    QNODE* curr;
+    QNODE* pred;
     
     curr = queue->root;
     while (curr != NULL) {
@@ -27,9 +28,9 @@ int queue_clear(QUEUE *queue)
     return 0;
 }
 
-int queue_insert(QUEUE *queue, char *value)
+int queue_insert(QUEUE* queue, char* value)
 {
-    QNODE *node;
+    QNODE* node;
     
     node = malloc(sizeof(QNODE));
     node->value = strdup(value);
@@ -41,9 +42,10 @@ int queue_insert(QUEUE *queue, char *value)
     return 0;
 }
 
-int queue_remove(QUEUE *queue, char *value)
+int queue_remove(QUEUE* queue, char* value)
 {
-    QNODE *curr, *pred;
+    QNODE* curr;
+    QNODE* pred;
     
     curr = queue->root;
     pred = NULL;
@@ -66,10 +68,10 @@ int queue_remove(QUEUE *queue, char *value)
    return 1; 
 }
 
-char *queue_peek(QUEUE *queue)
+char* queue_peek(QUEUE* queue)
 {
-    QNODE *node;
-    char *value;
+    QNODE* node;
+    char* value;
     
     node = queue->root;
     if (node != NULL) {
@@ -83,9 +85,10 @@ char *queue_peek(QUEUE *queue)
     return NULL;
 }
 
-void queue_dispose(QUEUE *queue)
+void queue_dispose(QUEUE* queue)
 {
-    QNODE *curr, *pred;
+    QNODE* curr;
+    QNODE* pred;
     
     curr = queue->root;
     while (curr != NULL) {

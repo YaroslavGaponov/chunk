@@ -1,6 +1,6 @@
 #include "hash.h"
 
-unsigned long hash_get(unsigned char * str)
+unsigned long hash_get(unsigned char*  str)
 {
    unsigned long hash = 5381;
    int c;

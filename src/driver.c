@@ -1,22 +1,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "global.h"
 #include "driver.h"
 #include "hash.h"
 
 typedef struct RECORD
 {
-    char *key;
-    char *value;
+    char* key;
+    char* value;
     OFFSET next;
 } RECORD;
 
-static int _driver_format(FILE *fp, int hash_table_size)
+static int _driver_format(FILE* fp, int hash_table_size)
 {
     int i;
-    HEADER *header;
-    OFFSET *htable;    
+    HEADER* header;
+    OFFSET* htable;    
     
     header = malloc(sizeof(HEADER));
     header->hash_table_size = hash_table_size;
@@ -24,7 +23,7 @@ static int _driver_format(FILE *fp, int hash_table_size)
     fwrite(header, sizeof(HEADER), 1, fp);
     free(header);
     
-    htable = malloc(sizeof(OFFSET) * hash_table_size);
+    htable = malloc(sizeof(OFFSET)*  hash_table_size);
     for(i = 0; i < hash_table_size; i++) {
         htable[i] = MARKER_END;
     }
@@ -34,11 +33,11 @@ static int _driver_format(FILE *fp, int hash_table_size)
     return 0;
 }
 
-static RECORD *_driver_load(FILE *fp, OFFSET offset)
+static RECORD* _driver_load(FILE* fp, OFFSET offset)
 {
     int key_size;
     int value_size;
-    RECORD *rec;
+    RECORD* rec;
     
     rec = malloc(sizeof(RECORD));    
     fseek(fp, offset, SEEK_SET);        
@@ -53,7 +52,7 @@ static RECORD *_driver_load(FILE *fp, OFFSET offset)
     return rec;
 }
 
-static OFFSET _driver_save(FILE *fp, RECORD *rec)
+static OFFSET _driver_save(FILE* fp, RECORD* rec)
 {        
     int key_size;
     int value_size;
@@ -73,16 +72,16 @@ static OFFSET _driver_save(FILE *fp, RECORD *rec)
     return offset;
 }
 
-static int _driver_update_first(FILE *fp, int indx, OFFSET next)
+static int _driver_update_first(FILE* fp, int indx, OFFSET next)
 {
-    fseek(fp, sizeof(HEADER) + sizeof(OFFSET) * indx, SEEK_SET);
+    fseek(fp, sizeof(HEADER) + sizeof(OFFSET)*  indx, SEEK_SET);
     fwrite(&next, sizeof(OFFSET), 1, fp);
     fflush(fp);
     
     return 0;    
 }
 
-static int _driver_update_next(FILE *fp, OFFSET offset, OFFSET next)
+static int _driver_update_next(FILE* fp, OFFSET offset, OFFSET next)
 {
     int key_size;
     int value_size;
@@ -97,9 +96,9 @@ static int _driver_update_next(FILE *fp, OFFSET offset, OFFSET next)
     return 0;    
 }
 
-int driver_create(char *filename, int hash_table_size)
+int driver_create(char* filename, int hash_table_size)
 {
-    FILE *fp;
+    FILE* fp;
     int err;
     
     fp = fopen (filename, "w+");
@@ -118,9 +117,9 @@ int driver_create(char *filename, int hash_table_size)
     return 0;
 }
 
-int driver_open(DRIVER *driver, char *filename)
+int driver_open(DRIVER* driver, char* filename)
 {
-    FILE *fp;
+    FILE* fp;
 
     fp = fopen (filename, "r+");
     if (fp == NULL) {
@@ -133,20 +132,24 @@ int driver_open(DRIVER *driver, char *filename)
     driver->header = malloc(sizeof(HEADER));        
     fseek(driver->fp, 0L, SEEK_SET);
     fread(driver->header, sizeof(HEADER), 1, driver->fp);    
-    driver->htable = malloc(sizeof(OFFSET) * driver->header->hash_table_size);
+    driver->htable = malloc(sizeof(OFFSET)*  driver->header->hash_table_size);
     fread(driver->htable, sizeof(OFFSET), driver->header->hash_table_size, driver->fp);
     
     return 0;
 }
 
 
-int driver_set(DRIVER *driver, char *key, char *value)
+int driver_set(DRIVER* driver, char* key, char* value)
 {
-    int indx, cmp;
-    OFFSET curr_offset, pred_offset, new_offset;
-    RECORD *cur_rec, new_rec;
+    int indx;
+    int cmp;
+    OFFSET curr_offset;
+    OFFSET pred_offset;
+    OFFSET new_offset;
+    RECORD* cur_rec;
+    RECORD new_rec;
     
-    new_rec.key = malloc(sizeof(char) * strlen(key));
+    new_rec.key = malloc(sizeof(char)*  strlen(key));
     new_rec.key = key;
     new_rec.value = value;
     new_rec.next = MARKER_END;
@@ -200,7 +203,7 @@ int driver_set(DRIVER *driver, char *key, char *value)
     return 0;
 }
 
-int driver_has(DRIVER *driver, char *key)
+int driver_has(DRIVER* driver, char* key)
 {
     if (driver_get(driver, key) == NULL) {
         return 0;
@@ -208,9 +211,9 @@ int driver_has(DRIVER *driver, char *key)
     return 1;
 }
 
-char *driver_get(DRIVER *driver, char *key)
+char* driver_get(DRIVER* driver, char* key)
 {
-    RECORD *rec;
+    RECORD* rec;
     OFFSET offset;
     int indx;    
     int cmp;
@@ -232,10 +235,11 @@ char *driver_get(DRIVER *driver, char *key)
     return NULL;
 }
 
-int driver_remove(DRIVER *driver, char *key)
+int driver_remove(DRIVER* driver, char* key)
 {
-    RECORD *rec;
-    OFFSET cur, pred;
+    RECORD* rec;
+    OFFSET cur;
+    OFFSET pred;
     int indx;
     int cmp;    
     
@@ -266,7 +270,7 @@ int driver_remove(DRIVER *driver, char *key)
     return 0;
 }
 
-void driver_close(DRIVER *driver)
+void driver_close(DRIVER* driver)
 {
     funlockfile(driver->fp);
     
@@ -276,17 +280,19 @@ void driver_close(DRIVER *driver)
     free(driver->header);
 }
 
-void driver_for_each(DRIVER *driver, int (*iterator)(char *key, char *value))
+void driver_for_each(DRIVER* driver, int (*iterator)(char* key, char* value))
 {
-    int i, offset, next;
-    RECORD *rec;
+    int i;
+    int done;
+    OFFSET offset;    
+    RECORD* rec;
 
     for(i = 0; i < driver->header->hash_table_size; i++) {
         offset = driver->htable[i];
         while (offset != MARKER_END) {            
             rec = _driver_load(driver->fp, offset);
-            next = iterator(rec->key, rec->value);
-            if (!next) {
+            done = iterator(rec->key, rec->value);
+            if (done) {
                 return;
             }
             offset = rec->next;

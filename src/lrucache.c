@@ -1,7 +1,7 @@
 
 #include "lrucache.h"
 
-lrucache_init(LRUCACHE *lrucache, int size)
+lrucache_init(LRUCACHE* lrucache, int size)
 {
     int err;
     
@@ -22,7 +22,7 @@ lrucache_init(LRUCACHE *lrucache, int size)
     return 0;
 }
 
-int lrucache_clear(LRUCACHE *lrucache)
+int lrucache_clear(LRUCACHE* lrucache)
 {
     int err;
     
@@ -40,7 +40,7 @@ int lrucache_clear(LRUCACHE *lrucache)
 }
 
 
-char *lrucache_get(LRUCACHE *lrucache, char *key)
+char* lrucache_get(LRUCACHE* lrucache, char* key)
 {
     queue_remove(lrucache->queue, key);
     queue_insert(lrucache->queue, key);
@@ -48,14 +48,14 @@ char *lrucache_get(LRUCACHE *lrucache, char *key)
     return map_get(lrucache->map, key);
 }
 
-int lrucache_has(LRUCACHE *lrucache, char *key)
+int lrucache_has(LRUCACHE* lrucache, char* key)
 {
     return map_has(lrucache->map, key);
 }
 
-int lrucache_set(LRUCACHE *lrucache, char *key, char *value)
+int lrucache_set(LRUCACHE* lrucache, char* key, char* value)
 {
-    char *k;
+    char* k;
     
     while (map_length(lrucache->map) >= lrucache->size) {
         k = queue_peek(lrucache->queue);
@@ -70,7 +70,7 @@ int lrucache_set(LRUCACHE *lrucache, char *key, char *value)
     return map_set(lrucache->map, key, value);
 }
 
-int lrucache_remove(LRUCACHE *lrucache, char *key)
+int lrucache_remove(LRUCACHE* lrucache, char* key)
 {
     queue_remove(lrucache->queue, key);
     map_remove(lrucache->map, key);
@@ -78,7 +78,7 @@ int lrucache_remove(LRUCACHE *lrucache, char *key)
     return 0;
 }
 
-void lrucache_dispose(LRUCACHE *lrucache)
+void lrucache_dispose(LRUCACHE* lrucache)
 {
     map_dispose(lrucache->map);
     queue_dispose(lrucache->queue);
