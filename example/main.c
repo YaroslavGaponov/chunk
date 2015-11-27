@@ -14,7 +14,6 @@ int display (char* key, char* value)
 }
 
 int main(int argc, char* argv[]) {
-
     int err, i;
     char key[10], value[10];    
     CHUNK* chunk;

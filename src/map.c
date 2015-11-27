@@ -20,18 +20,18 @@ int map_init(MAP* map) {
 int map_clear(MAP* map)
 {
     MNODE* curr;
-    MNODE* pred;
+    MNODE* prev;
     int i;
     
     for(i = 0; i < map->hash_table_size; i++) {
         curr = map->htable[i];
         while (curr != NULL) {
-            pred = curr;
+            prev = curr;
             curr = curr->next;
             
-            free(pred->key);
-            free(pred->value);
-            free(pred);
+            free(prev->key);
+            free(prev->value);
+            free(prev);
         }
         map->htable[i] = NULL;
     }
@@ -45,7 +45,7 @@ int map_set(MAP* map, char* key, char* value)
 {
     MAP* _map;
     MNODE* curr;
-    MNODE* pred;
+    MNODE* prev;
     MNODE* node;
     int cmp;
     int indx;
@@ -59,12 +59,12 @@ int map_set(MAP* map, char* key, char* value)
     indx = hash_get(key) % map->hash_table_size;
     
     curr = map->htable[indx];
-    pred = NULL;
+    prev = NULL;
     while(curr != NULL) {
         cmp = strcmp(curr->key, key);
         if (cmp == 0) {
-            if (pred !=  NULL) {
-                pred->next = node;
+            if (prev !=  NULL) {
+                prev->next = node;
             } else {
                 map->htable[indx] = node;
             }
@@ -75,8 +75,8 @@ int map_set(MAP* map, char* key, char* value)
             goto done;
         }
         if (cmp > 0) {
-            if (pred != NULL) {
-                pred->next = node;
+            if (prev != NULL) {
+                prev->next = node;
             } else {
                 map->htable[indx] = node;
             }
@@ -85,12 +85,12 @@ int map_set(MAP* map, char* key, char* value)
             goto done;
         }
         
-        pred = curr;
+        prev = curr;
         curr = curr->next;
     }
     
-    if (pred != NULL) {
-        pred->next = node;
+    if (prev != NULL) {
+        prev->next = node;
     } else {
         map->htable[indx] = node;
     }
@@ -159,20 +159,20 @@ int map_has(MAP* map, char* key)
 int map_remove(MAP* map, char* key)
 {
     MNODE* curr;
-    MNODE* pred;
+    MNODE* prev;
     int cmp;
     int indx;
     
     indx = hash_get(key) % map->hash_table_size;
     curr = map->htable[indx];
-    pred = NULL;
+    prev = NULL;
     while (curr != NULL) {
         cmp = strcmp(curr->key, key);        
         if (cmp == 0) {
-            if (pred == NULL) {
+            if (prev == NULL) {
                 map->htable[indx] = curr->next;
             } else {
-                pred->next = curr->next;
+                prev->next = curr->next;
             }
             
             free(curr->key);
@@ -187,7 +187,7 @@ int map_remove(MAP* map, char* key)
             return -1;
         }
         
-        pred = curr;
+        prev = curr;
         curr = curr->next;
     }
     return -2;
@@ -201,18 +201,18 @@ int map_length(MAP* map)
 void map_dispose(MAP* map)
 {
     MNODE* curr;
-    MNODE* pred;
+    MNODE* prev;
     int i;
     
     for(i = 0; i < map->hash_table_size; i++) {
         curr = map->htable[i];
         while (curr != NULL) {
-            pred = curr;
+            prev = curr;
             curr = curr->next;
             
-            free(pred->key);
-            free(pred->value);
-            free(pred);
+            free(prev->key);
+            free(prev->value);
+            free(prev);
         }
     }
     free(map->htable);

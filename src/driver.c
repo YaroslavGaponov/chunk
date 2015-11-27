@@ -144,9 +144,9 @@ int driver_set(DRIVER* driver, char* key, char* value)
     int indx;
     int cmp;
     OFFSET curr_offset;
-    OFFSET pred_offset;
+    OFFSET prev_offset;
     OFFSET new_offset;
-    RECORD* cur_rec;
+    RECORD* curr_rec;
     RECORD new_rec;
     
     new_rec.key = malloc(sizeof(char)*  strlen(key));
@@ -164,41 +164,41 @@ int driver_set(DRIVER* driver, char* key, char* value)
         return 0;
     }
     
-    pred_offset = MARKER_END;
+    prev_offset = MARKER_END;
     do {
-        cur_rec = _driver_load(driver->fp, curr_offset);
+        curr_rec = _driver_load(driver->fp, curr_offset);
         
-        cmp = strcmp(cur_rec->key, key);
+        cmp = strcmp(curr_rec->key, key);
         if (cmp == 0) {
-            new_rec.next = cur_rec->next;
+            new_rec.next = curr_rec->next;
             new_offset = _driver_save(driver->fp, &new_rec);    
-            if (pred_offset == MARKER_END) {                                
+            if (prev_offset == MARKER_END) {                                
                 driver->htable[indx] = new_offset;
                 _driver_update_first(driver->fp, indx, new_offset);
             } else {
-                _driver_update_next(driver->fp, pred_offset, new_offset);
+                _driver_update_next(driver->fp, prev_offset, new_offset);
             }
             return 0;
         }
         if (cmp > 0) {
             new_rec.next = curr_offset;
             new_offset = _driver_save(driver->fp, &new_rec);    
-            if (pred_offset == MARKER_END) {                                
+            if (prev_offset == MARKER_END) {                                
                 driver->htable[indx] = new_offset;
                 _driver_update_first(driver->fp, indx, new_offset);
             } else {
-                _driver_update_next(driver->fp, pred_offset, new_offset);
+                _driver_update_next(driver->fp, prev_offset, new_offset);
             }
             return 0;
         }
         
-        pred_offset = curr_offset;
-        curr_offset = cur_rec->next;
+        prev_offset = curr_offset;
+        curr_offset = curr_rec->next;
         
     } while (curr_offset != MARKER_END);
     
     new_offset = _driver_save(driver->fp, &new_rec);
-    _driver_update_next(driver->fp, pred_offset, new_offset);
+    _driver_update_next(driver->fp, prev_offset, new_offset);
 
     return 0;
 }
@@ -238,33 +238,33 @@ char* driver_get(DRIVER* driver, char* key)
 int driver_remove(DRIVER* driver, char* key)
 {
     RECORD* rec;
-    OFFSET cur;
-    OFFSET pred;
+    OFFSET curr;
+    OFFSET prev;
     int indx;
     int cmp;    
     
     indx = hash_get(key) % driver->header->hash_table_size;
     
-    cur = driver->htable[indx];
-    pred = MARKER_END;
+    curr = driver->htable[indx];
+    prev = MARKER_END;
     
-    while (cur != MARKER_END) {
-        rec = _driver_load(driver->fp, cur);
+    while (curr != MARKER_END) {
+        rec = _driver_load(driver->fp, curr);
         cmp = strcmp(rec->key, key);
         if (cmp == 0) {
-            if (pred == MARKER_END) {
+            if (prev == MARKER_END) {
                 driver->htable[indx] = rec->next;
                 _driver_update_first(driver->fp, indx, driver->htable[indx]);
             } else {
-                _driver_update_next(driver->fp, pred, rec->next);
+                _driver_update_next(driver->fp, prev, rec->next);
             }
             return 0;
         }
         if (cmp > 0) {
             return 0;
         }
-        pred = cur;
-        cur = rec->next;        
+        prev = curr;
+        curr = rec->next;        
     }
     
     return 0;

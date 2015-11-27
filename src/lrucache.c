@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 #include "lrucache.h"
 
 lrucache_init(LRUCACHE* lrucache, int size)
@@ -61,8 +61,9 @@ int lrucache_set(LRUCACHE* lrucache, char* key, char* value)
         k = queue_peek(lrucache->queue);
         if (k == NULL) {
             break;
+        } else {
+            map_remove(lrucache->map, k);
         }
-        map_remove(lrucache->map, k);
     }
     
     queue_insert(lrucache->queue, key);

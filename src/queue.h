@@ -3,16 +3,9 @@
 
 #include <stdlib.h>
 
-struct QNODE {
-    char* value;
-    struct QNODE* next;
-};
-
-typedef struct QNODE QNODE;
 
 typedef struct QUEUE {
     int length;
-    QNODE* root;
 } QUEUE;
 
 int queue_init(QUEUE* queue);
