@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 
+#define DEFAULT_MAP_HABLE_SIZE 10
+#define MAP_MAX_SORTED_LINKED_LIST_SIZE 5
+
 struct MNODE {
     char* key;
     char* value;
@@ -13,7 +16,8 @@ typedef struct MNODE MNODE;
 
 typedef struct MAP {
     int length;
-    MNODE* root;
+    int hash_table_size;
+    MNODE** htable;
 } MAP;
 
 int map_init(MAP* map);
@@ -24,5 +28,4 @@ int map_remove(MAP* map, char* key);
 int map_has(MAP* map, char* key);
 void map_dispose(MAP* map);
 int map_length(MAP* map);
-
 #endif
