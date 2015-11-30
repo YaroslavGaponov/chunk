@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "driver.h"
 #include "hash.h"
@@ -103,7 +104,7 @@ int driver_create(char* filename, int hash_table_size)
     
     fp = fopen (filename, "w+");
     if (fp == NULL) {
-        return -1;
+        return errno;
     }
     
     err = _driver_format(fp, hash_table_size);
@@ -111,7 +112,7 @@ int driver_create(char* filename, int hash_table_size)
     fclose(fp);
     
     if (err) {
-        return -2;
+        return errno;
     }
     
     return 0;
@@ -123,7 +124,7 @@ int driver_open(DRIVER* driver, char* filename)
 
     fp = fopen (filename, "r+");
     if (fp == NULL) {
-        return -1;
+        return errno;
     }
     
     flockfile(fp);
