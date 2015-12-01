@@ -30,7 +30,6 @@ int map_clear(MAP* map)
             curr = curr->next;
             
             free(prev->key);
-            free(prev->value);
             free(prev);
         }
         map->htable[i] = NULL;
@@ -41,7 +40,7 @@ int map_clear(MAP* map)
     return 0;
 }
 
-int map_set(MAP* map, char* key, char* value)
+int map_set(MAP* map, char* key, void* value)
 {
     MAP* _map;
     MNODE* curr;
@@ -53,7 +52,7 @@ int map_set(MAP* map, char* key, char* value)
     
     node = malloc(sizeof(MNODE));    
     node->key = strdup(key);
-    node->value = strdup(value);
+    node->value = value;
     node->next = NULL;
     
     indx = hash_get(key) % map->hash_table_size;
@@ -70,7 +69,6 @@ int map_set(MAP* map, char* key, char* value)
             }
             node->next = curr->next;
             free(curr->key);
-            free(curr->value);
             free(curr);            
             goto done;
         }
@@ -112,7 +110,7 @@ int map_set(MAP* map, char* key, char* value)
     return 0;
 }
 
-char* map_get(MAP* map, char* key)
+void* map_get(MAP* map, char* key)
 {
     MNODE* curr;
     int cmp;
@@ -176,7 +174,6 @@ int map_remove(MAP* map, char* key)
             }
             
             free(curr->key);
-            free(curr->value);
             free(curr);
             
             map->length--;
@@ -211,7 +208,6 @@ void map_dispose(MAP* map)
             curr = curr->next;
             
             free(prev->key);
-            free(prev->value);
             free(prev);
         }
     }

@@ -8,7 +8,7 @@
 
 struct MNODE {
     char* key;
-    char* value;
+    void* value;
     struct MNODE* next;
 };
 
@@ -22,8 +22,8 @@ typedef struct MAP {
 
 int map_init(MAP* map);
 int map_clear(MAP* map);
-int map_set(MAP* map, char* key, char* value);
-char* map_get(MAP* map, char* key);
+int map_set(MAP* map, char* key, void* value);
+void* map_get(MAP* map, char* key);
 int map_remove(MAP* map, char* key);
 int map_has(MAP* map, char* key);
 void map_dispose(MAP* map);
