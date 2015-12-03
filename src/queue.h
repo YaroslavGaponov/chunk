@@ -5,6 +5,7 @@
 
 struct QNODE {
     char *value;
+    struct QNODE* prev; 
     struct QNODE* next; 
 };
 

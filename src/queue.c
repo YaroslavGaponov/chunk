@@ -12,21 +12,12 @@ int queue_init(QUEUE* queue)
 
 int queue_clear(QUEUE* queue)
 {
-    QNODE* curr;
-    QNODE* pred;
+    int err;
     
-    curr = queue->head;
-    while (curr != NULL) {
-        pred = curr;
-        curr = curr->next;
-        free(pred->value);
-        free(pred);
-    }
+    queue_dispose(queue);    
+    err = queue_init(queue);
     
-    queue->head = NULL;
-    queue->tail = NULL;
-
-    return 0;
+    return err;
 }
 
 int queue_is_empty(QUEUE* queue) {
@@ -35,16 +26,17 @@ int queue_is_empty(QUEUE* queue) {
 
 int queue_insert(QUEUE* queue, char* value)
 {
-    QNODE* node;
+    QNODE* qnode;
     
-    node = malloc(sizeof(QNODE));
-    node->value = strdup(value);
-    node->next = NULL;
+    qnode = malloc(sizeof(QNODE));
+    qnode->value = strdup(value);
+    qnode->prev = queue->tail;
+    qnode->next = NULL;
     
-    if (queue->head == NULL) {
-        queue->head = queue->tail = node;
+    if (queue_is_empty(queue)) {
+        queue->head = queue->tail = qnode;
     } else {
-        queue->tail->next = node;
+        queue->tail->next = qnode;
         queue->tail = queue->tail->next;
     }
     
@@ -53,31 +45,31 @@ int queue_insert(QUEUE* queue, char* value)
 
 int queue_remove(QUEUE* queue, char* value)
 {
-    QNODE* curr;
-    QNODE* pred;
+    QNODE* qnode;
     
-    curr = queue->head;
-    pred = NULL;    
-    while (curr != NULL) {
-        if (strcmp(curr->value, value) == 0) {
-            if (queue->tail == curr) {
-                if (curr->next == NULL) {
-                    queue->tail = pred;
-                } else {
-                    queue->tail = curr->next;
-                }
-            }
-            if (pred == NULL) {
-                queue->head = curr->next;
+    qnode = queue->head;
+
+    while (qnode != NULL) {
+        if (strcmp(qnode->value, value) == 0) {
+            
+            if (qnode->prev != NULL) {
+                qnode->prev->next = qnode->next;
             } else {
-                pred->next = curr->next;
+                queue->head = qnode->next;
             }
-            free(curr->value);
-            free(curr);
+            
+            if (qnode->next != NULL) {
+                qnode->next->prev = qnode->prev;
+            } else {
+                queue->tail = qnode->prev;
+            }
+            
+            free(qnode->value);
+            free(qnode);
+            
             return 0;
         }
-        pred = curr;
-        curr = curr->next;
+        qnode = qnode->next;
     }
 
     return -1;
@@ -86,16 +78,17 @@ int queue_remove(QUEUE* queue, char* value)
 char* queue_peek(QUEUE* queue)
 {
     char* value;
-    QNODE* head;
+    QNODE* qnode;
     
     if (queue->head == NULL) {
         return NULL;
     }
     
     value = queue->head->value;
-    head = queue->head->next;    
+    qnode = queue->head->next;
+    qnode->prev = NULL;
     free(queue->head);
-    queue->head = head;
+    queue->head = qnode;
     if (queue->head == NULL) {
         queue->tail = NULL;
     }
@@ -106,17 +99,14 @@ char* queue_peek(QUEUE* queue)
 
 void queue_dispose(QUEUE* queue)
 {
-    QNODE* curr;
-    QNODE* pred;
+    QNODE* qnode;
     
-    curr = queue->head;
-    while (curr != NULL) {
-        pred = curr;
-        curr = curr->next;
-        free(pred->value);
-        free(pred);
+    qnode = queue->head;
+    while (qnode != NULL) {        
+        if (qnode->prev != NULL) {
+            free(qnode->prev->value);
+            free(qnode->prev);
+        }
+        qnode = qnode->next;
     }
-    
-    queue->head = NULL;
-    queue->tail = NULL;
 }
