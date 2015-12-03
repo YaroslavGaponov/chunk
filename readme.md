@@ -12,21 +12,20 @@
 
 #define FILENAME "chunk.db"
 #define HTABLE_SIZE 9973
-#define CACHE_SIZE  10
+#define CACHE_SIZE 10
 
 int SIZE = 15;
 
-int display (char *key, char *value)
+int display (char* key, char* value)
 {
     printf("chunk_for_each %s = %s\n");
-    return 1;
+    return 0;
 }
 
-int main(int argc, char *argv[]) {
-
+int main(int argc, char* argv[]) {
     int err, i;
     char key[10], value[10];    
-    CHUNK *chunk;
+    CHUNK* chunk;
     
     /* create database file */
     err = chunk_create(FILENAME, HTABLE_SIZE);

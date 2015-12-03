@@ -2,11 +2,12 @@
 #define QUEUE_H
 
 #include <stdlib.h>
+#include "map.h"
 
 struct QNODE {
     char *value;
     struct QNODE* prev; 
-    struct QNODE* next; 
+    struct QNODE* next;    
 };
 
 typedef struct QNODE QNODE;
@@ -14,6 +15,7 @@ typedef struct QNODE QNODE;
 typedef struct QUEUE {
     QNODE* head;
     QNODE* tail;
+    MAP* map;
 } QUEUE;
 
 int queue_init(QUEUE* queue);

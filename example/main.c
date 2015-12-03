@@ -10,7 +10,7 @@ int SIZE = 15;
 int display (char* key, char* value)
 {
     printf("chunk_for_each %s = %s\n");
-    return 1;
+    return 0;
 }
 
 int main(int argc, char* argv[]) {
