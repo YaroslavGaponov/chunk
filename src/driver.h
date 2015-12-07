@@ -9,7 +9,9 @@ typedef long OFFSET;
 
 typedef struct HEADER
 {
-    long hash_table_size;
+    char sign[5];
+    long size;
+    long hash_table_size;    
 } HEADER;
 
 typedef struct DRIVER

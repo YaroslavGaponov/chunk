@@ -19,7 +19,9 @@ static int _driver_format(FILE* fp, int hash_table_size)
     OFFSET* htable;    
     
     header = malloc(sizeof(HEADER));
+    memcpy(header->sign, "CHUNK", 5);
     header->hash_table_size = hash_table_size;
+    header->size = 0L;
     fseek(fp, 0L, SEEK_SET);
     fwrite(header, sizeof(HEADER), 1, fp);
     free(header);
@@ -30,6 +32,17 @@ static int _driver_format(FILE* fp, int hash_table_size)
     }
     fwrite(htable, sizeof(OFFSET), hash_table_size, fp);
     free(htable);
+    
+    fflush(fp);
+    
+    return 0;
+}
+
+static int _driver_save_size(FILE* fp, long size)
+{
+    fseek(fp, 5L ,SEEK_SET);
+    fwrite(&size, sizeof(long), 1, fp);
+    fflush(fp);
     
     return 0;
 }
@@ -132,7 +145,12 @@ int driver_open(DRIVER* driver, char* filename)
     driver->fp = fp;
     driver->header = malloc(sizeof(HEADER));        
     fseek(driver->fp, 0L, SEEK_SET);
-    fread(driver->header, sizeof(HEADER), 1, driver->fp);    
+    fread(driver->header, sizeof(HEADER), 1, driver->fp);
+
+    if (strcmp(driver->header->sign, "CHUNK") != 0) {
+        return -1;
+    }
+    
     driver->htable = malloc(sizeof(OFFSET)*  driver->header->hash_table_size);
     fread(driver->htable, sizeof(OFFSET), driver->header->hash_table_size, driver->fp);
     
@@ -162,6 +180,7 @@ int driver_set(DRIVER* driver, char* key, char* value)
         new_offset = _driver_save(driver->fp, &new_rec);    
         driver->htable[indx] = new_offset;
         _driver_update_first(driver->fp, indx, new_offset);
+        _driver_save_size(driver->fp, ++driver->header->size);
         return 0;
     }
     
@@ -172,7 +191,7 @@ int driver_set(DRIVER* driver, char* key, char* value)
         cmp = strcmp(curr_rec->key, key);
         if (cmp == 0) {
             new_rec.next = curr_rec->next;
-            new_offset = _driver_save(driver->fp, &new_rec);    
+            new_offset = _driver_save(driver->fp, &new_rec);            
             if (prev_offset == MARKER_END) {                                
                 driver->htable[indx] = new_offset;
                 _driver_update_first(driver->fp, indx, new_offset);
@@ -183,7 +202,8 @@ int driver_set(DRIVER* driver, char* key, char* value)
         }
         if (cmp > 0) {
             new_rec.next = curr_offset;
-            new_offset = _driver_save(driver->fp, &new_rec);    
+            new_offset = _driver_save(driver->fp, &new_rec);
+            _driver_save_size(driver->fp, ++driver->header->size);
             if (prev_offset == MARKER_END) {                                
                 driver->htable[indx] = new_offset;
                 _driver_update_first(driver->fp, indx, new_offset);
@@ -200,6 +220,7 @@ int driver_set(DRIVER* driver, char* key, char* value)
     
     new_offset = _driver_save(driver->fp, &new_rec);
     _driver_update_next(driver->fp, prev_offset, new_offset);
+    _driver_save_size(driver->fp, ++driver->header->size);
 
     return 0;
 }
@@ -259,6 +280,7 @@ int driver_remove(DRIVER* driver, char* key)
             } else {
                 _driver_update_next(driver->fp, prev, rec->next);
             }
+            _driver_save_size(driver->fp, --driver->header->size);
             return 0;
         }
         if (cmp > 0) {
