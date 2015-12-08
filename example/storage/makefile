@@ -3,7 +3,7 @@ SOURCE = ../../src/driver.c ../../src/hash.c ../../src/map.c ../../src/queue.c .
 LIBS = ../../src
 
 all: 
-	gcc -I $(LIBS) $(SOURCE)  -o main 
+	gcc -g -I $(LIBS) $(SOURCE)  -o main 
 	mkdir ./db
 clean:
 	rm -r ./db

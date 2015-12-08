@@ -19,17 +19,25 @@ static int _driver_format(FILE* fp, int hash_table_size)
     OFFSET* htable;    
     
     header = malloc(sizeof(HEADER));
+    if (header == NULL) {
+        return -1;
+    }    
     memcpy(header->sign, "CHUNK", 5);
     header->hash_table_size = hash_table_size;
     header->size = 0L;
     fseek(fp, 0L, SEEK_SET);
-    fwrite(header, sizeof(HEADER), 1, fp);
+    fwrite(header, sizeof(HEADER), 1, fp);    
     free(header);
     
-    htable = malloc(sizeof(OFFSET)*  hash_table_size);
+    htable = malloc(sizeof(OFFSET) * hash_table_size);    
+    if (htable == NULL) {
+        return -2;
+    }
     for(i = 0; i < hash_table_size; i++) {
         htable[i] = MARKER_END;
     }
+    
+    fseek(fp, sizeof(HEADER), SEEK_SET);
     fwrite(htable, sizeof(OFFSET), hash_table_size, fp);
     free(htable);
     
@@ -151,7 +159,8 @@ int driver_open(DRIVER* driver, char* filename)
         return -1;
     }
     
-    driver->htable = malloc(sizeof(OFFSET)*  driver->header->hash_table_size);
+    driver->htable = malloc(sizeof(OFFSET) *  driver->header->hash_table_size);
+    fseek(driver->fp, sizeof(HEADER), SEEK_SET);
     fread(driver->htable, sizeof(OFFSET), driver->header->hash_table_size, driver->fp);
     
     return 0;

@@ -6,7 +6,7 @@
 #define CACHE_SIZE 10
 #define CHUNKS 5
 
-int SIZE = 1500;
+int SIZE = 15;
 
 int display (char* key, char* value)
 {
@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
         printf("Error: problem with open storage\n");
         return -2;
     }    
-
+exit(-1);
     /* insert  */
     for(i=0; i<SIZE; i++) {
         sprintf(key, "%s%d", "key", i);

@@ -19,7 +19,7 @@ int storage_create(char* path, int chunks, int hash_table_size)
     chunk_set(master, "chunks", tmp);
 
     for(i = 0; i < chunks; i++) {
-        sprintf(filename, "%s/chunk.%d", path, i);        
+        sprintf(filename, "%s/chunk_%d", path, i);
         chunk_create(filename, hash_table_size);
     }
     
@@ -33,16 +33,16 @@ int storage_open(STORAGE* storage, char* path, int cache_size)
 {
     char filename[PATH_MAX];
     int i;
+    int err;
     
     storage->master = malloc(sizeof(CHUNK));    
     sprintf(filename, "%s/master", path);    
-    chunk_open(storage->master, filename, 100);
-    
+    err = chunk_open(storage->master, filename, 100);
     storage->length = atoi(chunk_get(storage->master, "chunks"));    
     storage->chunks = malloc(sizeof(CHUNK) * storage->length);
 
     for(i = 0; i < storage->length; i++) {
-        sprintf(filename, "%s/chunk.%d", path, i);
+        sprintf(filename, "%s/chunk_%d", path, i);
         storage->chunks[i] = malloc(sizeof(CHUNK));
         chunk_open(storage->chunks[i], filename, cache_size);
     }
